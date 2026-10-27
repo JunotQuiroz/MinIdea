@@ -1,7 +1,8 @@
 const {
     obtenerAutores,
     obtenerAutorPorId,
-    crearAutor
+    crearAutor,
+    actualizarAutorPorId
 } = require("../services/authorsService");
 
 async function listarAutores(req, res, next) {
@@ -89,8 +90,73 @@ async function registrarAutor(req, res, next) {
     }
 }
 
+async function actualizarAutor(req, res, next) {
+    try {
+        const id = Number(req.params.id);
+
+        if (!Number.isInteger(id) || id < 1 || id > 2147483647) {
+            return res.status(400).json({
+                error: "El ID debe ser un entero positivo válido"
+            });
+        }
+
+        const { name, email, bio } = req.body ?? {};
+
+        if (
+            typeof name !== "string" ||
+            name.trim().length === 0 ||
+            name.trim().length > 100
+        ) {
+            return res.status(400).json({
+                error: "El nombre debe contener entre 1 y 100 caracteres"
+            });
+        }
+
+        if (
+            typeof email !== "string" ||
+            email.trim().length > 255 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+        ) {
+            return res.status(400).json({
+                error: "El correo electrónico no es válido"
+            });
+        }
+
+        if (bio != null && typeof bio !== "string") {
+            return res.status(400).json({
+                error: "La biografía debe ser texto"
+            });
+        }
+
+        const autor = await actualizarAutorPorId(
+            id,
+            name.trim(),
+            email.trim().toLowerCase(),
+            bio == null ? null : bio.trim()
+        );
+
+        if (!autor) {
+            return res.status(404).json({
+                error: "Autor no encontrado"
+            });
+        }
+
+        return res.status(200).json(autor);
+
+    } catch (error) {
+        if (error.code === "23505") {
+            return res.status(409).json({
+                error: "El correo electrónico ya está registrado"
+            });
+        }
+
+        next(error);
+    }
+}
+
 module.exports = {
     listarAutores,
     mostrarAutor,
-    registrarAutor
+    registrarAutor,
+    actualizarAutor
 };

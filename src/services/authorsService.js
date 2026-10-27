@@ -26,8 +26,23 @@ async function crearAutor(name, email, bio) {
     return resultado.rows[0];
 }
 
+async function actualizarAutorPorId(id, name, email, bio) {
+    const resultado = await pool.query(
+        `UPDATE authors
+         SET name = $1,
+             email = $2,
+             bio = $3
+         WHERE id = $4
+         RETURNING id, name, email, bio, created_at`,
+        [name, email, bio, id]
+    );
+
+    return resultado.rows[0];
+}
+
 module.exports = {
     obtenerAutores,
     obtenerAutorPorId,
-    crearAutor
+    crearAutor,
+    actualizarAutorPorId
 };
