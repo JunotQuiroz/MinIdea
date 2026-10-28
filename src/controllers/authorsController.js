@@ -2,7 +2,8 @@ const {
     obtenerAutores,
     obtenerAutorPorId,
     crearAutor,
-    actualizarAutorPorId
+    actualizarAutorPorId,
+    eliminarAutorPorId
 } = require("../services/authorsService");
 
 async function listarAutores(req, res, next) {
@@ -154,9 +155,39 @@ async function actualizarAutor(req, res, next) {
     }
 }
 
+
+async function eliminarAutor(req, res, next) {
+    try {
+        const id = Number(req.params.id);
+
+        if (!Number.isInteger(id) || id < 1 || id > 2147483647) {
+            return res.status(400).json({
+                error: "El ID debe ser un entero positivo válido"
+            });
+        }
+
+        const autor = await eliminarAutorPorId(id);
+
+        if (!autor) {
+            return res.status(404).json({
+                error: "Autor no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Autor eliminado correctamente",
+            autor: autor
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     listarAutores,
     mostrarAutor,
     registrarAutor,
-    actualizarAutor
+    actualizarAutor,
+    eliminarAutor
 };

@@ -40,9 +40,22 @@ async function actualizarAutorPorId(id, name, email, bio) {
     return resultado.rows[0];
 }
 
+
+async function eliminarAutorPorId(id) {
+    const resultado = await pool.query(
+        `DELETE FROM authors
+         WHERE id = $1
+         RETURNING id, name, email`,
+        [id]
+    );
+
+    return resultado.rows[0];
+}
+
 module.exports = {
     obtenerAutores,
     obtenerAutorPorId,
     crearAutor,
-    actualizarAutorPorId
+    actualizarAutorPorId,
+    eliminarAutorPorId
 };

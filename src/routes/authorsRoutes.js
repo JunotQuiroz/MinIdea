@@ -4,7 +4,8 @@ const {
     listarAutores,
     mostrarAutor,
     registrarAutor,
-    actualizarAutor
+    actualizarAutor,
+    eliminarAutor
 } = require("../controllers/authorsController");
 
 const router = express.Router();
@@ -16,5 +17,7 @@ router.post("/", registrarAutor);
 router.get("/:id", mostrarAutor);
 
 router.put("/:id", actualizarAutor);
+
+router.delete("/:id", eliminarAutor);
 
 module.exports = router;
