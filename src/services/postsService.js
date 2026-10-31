@@ -48,8 +48,46 @@ async function crearPublicacion(authorId, title, content, published) {
     return resultado.rows[0];
 }
 
+async function actualizarPublicacionPorId(
+    id,
+    authorId,
+    title,
+    content,
+    published
+) {
+    const resultado = await pool.query(
+        `UPDATE posts
+         SET author_id = $1,
+             title = $2,
+             content = $3,
+             published = $4
+         WHERE id = $5
+         RETURNING id, author_id, title, content, published`,
+        [authorId, title, content, published, id]
+    );
+
+    return resultado.rows[0];
+}
+
+
+async function eliminarPublicacionPorId(id) {
+    const resultado = await pool.query(
+        `DELETE FROM posts
+         WHERE id = $1
+         RETURNING id, author_id, title, content, published`,
+        [id]
+    );
+
+    return resultado.rows[0];
+}
+
+
 module.exports = {
     obtenerPublicaciones,
     obtenerPublicacionPorId,
-    crearPublicacion
+    crearPublicacion,
+    actualizarPublicacionPorId,
+    eliminarPublicacionPorId
 };
+
+
