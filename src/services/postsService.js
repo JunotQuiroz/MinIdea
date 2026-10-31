@@ -37,7 +37,19 @@ async function obtenerPublicacionPorId(id) {
     return resultado.rows[0];
 }
 
+async function crearPublicacion(authorId, title, content, published) {
+    const resultado = await pool.query(
+        `INSERT INTO posts (author_id, title, content, published)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id, author_id, title, content, published`,
+        [authorId, title, content, published]
+    );
+
+    return resultado.rows[0];
+}
+
 module.exports = {
     obtenerPublicaciones,
-    obtenerPublicacionPorId
+    obtenerPublicacionPorId,
+    crearPublicacion
 };

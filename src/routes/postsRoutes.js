@@ -3,12 +3,15 @@ const express = require("express");
 
 const {
     listarPublicaciones,
-    mostrarPublicacion
+    mostrarPublicacion,
+    registrarPublicacion
 } = require("../controllers/postsController");
 
 const router = express.Router();
 
 router.get("/", listarPublicaciones);
+
+router.post("/", registrarPublicacion);
 
 router.get("/:id", mostrarPublicacion);
 

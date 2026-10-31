@@ -1,6 +1,7 @@
 const {
     obtenerPublicaciones,
-    obtenerPublicacionPorId
+    obtenerPublicacionPorId,
+    crearPublicacion
 } = require("../services/postsService");
 
 async function listarPublicaciones(req, res, next) {
@@ -39,7 +40,66 @@ async function mostrarPublicacion(req, res, next) {
     }
 }
 
+
+async function registrarPublicacion(req, res, next) {
+    try {
+        const {
+            author_id,
+            title,
+            content,
+            published = false
+        } = req.body ?? {};
+
+        if (
+            !Number.isInteger(author_id) ||
+            author_id < 1 ||
+            author_id > 2147483647
+        ) {
+            return res.status(400).json({
+                error: "El ID del autor debe ser un entero positivo válido"
+            });
+        }
+
+        if (typeof title !== "string" || !title.trim()) {
+            return res.status(400).json({
+                error: "El título es obligatorio y debe ser texto"
+            });
+        }
+
+        if (typeof content !== "string" || !content.trim()) {
+            return res.status(400).json({
+                error: "El contenido es obligatorio y debe ser texto"
+            });
+        }
+
+        if (typeof published !== "boolean") {
+            return res.status(400).json({
+                error: "El estado published debe ser true o false"
+            });
+        }
+
+        const publicacion = await crearPublicacion(
+            author_id,
+            title.trim(),
+            content.trim(),
+            published
+        );
+
+        return res.status(201).json(publicacion);
+
+    } catch (error) {
+        if (error.code === "23503") {
+            return res.status(400).json({
+                error: "El autor indicado no existe"
+            });
+        }
+
+        next(error);
+    }
+}
+
 module.exports = {
     listarPublicaciones,
-    mostrarPublicacion
+    mostrarPublicacion,
+    registrarPublicacion
 };
