@@ -4,8 +4,10 @@ const {
     obtenerPublicacionPorId,
     crearPublicacion,
     actualizarPublicacionPorId,
-    eliminarPublicacionPorId
+    eliminarPublicacionPorId,
+    obtenerPublicacionesPorAutor
 } = require("../services/postsService");
+
 
 
 async function listarPublicaciones(req, res, next) {
@@ -215,10 +217,36 @@ async function eliminarPublicacion(req, res, next) {
 }
 
 
+async function obtenerPublicacionesDeAutor(req, res, next) {
+    try {
+        const authorIdTexto = req.params.authorId;
+        const authorId = Number(authorIdTexto);
+
+        if (
+            !/^[1-9]\d*$/.test(authorIdTexto) ||
+            !Number.isSafeInteger(authorId) ||
+            authorId > 2147483647
+        ) {
+            return res.status(400).json({
+                error: "El ID del autor debe ser un entero positivo válido"
+            });
+        }
+
+        const publicaciones = await obtenerPublicacionesPorAutor(authorId);
+
+        return res.status(200).json(publicaciones);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     listarPublicaciones,
     mostrarPublicacion,
     registrarPublicacion,
     actualizarPublicacion,
-    eliminarPublicacion
+    eliminarPublicacion,
+    obtenerPublicacionesDeAutor
 };
+

@@ -82,12 +82,34 @@ async function eliminarPublicacionPorId(id) {
 }
 
 
+async function obtenerPublicacionesPorAutor(authorId) {
+    const resultado = await pool.query(
+        `SELECT
+            p.id,
+            p.author_id,
+            a.name AS author_name,
+            p.title,
+            p.content,
+            p.published
+         FROM posts AS p
+         INNER JOIN authors AS a
+            ON p.author_id = a.id
+         WHERE p.author_id = $1
+         ORDER BY p.id`,
+        [authorId]
+    );
+
+    return resultado.rows;
+}
+
 module.exports = {
     obtenerPublicaciones,
     obtenerPublicacionPorId,
     crearPublicacion,
     actualizarPublicacionPorId,
-    eliminarPublicacionPorId
+    eliminarPublicacionPorId,
+    obtenerPublicacionesPorAutor
 };
+
 
 
