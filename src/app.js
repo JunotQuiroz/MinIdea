@@ -18,4 +18,23 @@ app.get("/health", (req, res) => {
     });
 });
 
+
+app.use((error, req, res, next) => {
+    console.error("Error en MinIdea:", error.message);
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    if (error.type === "entity.parse.failed") {
+        return res.status(400).json({
+            error: "El formato JSON es inválido"
+        });
+    }
+
+    return res.status(500).json({
+        error: "Error interno del servidor"
+    });
+});
+
 module.exports = app;

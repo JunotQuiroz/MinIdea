@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   
+
 "scripts": {
+  "start": "node src/server.js",
   "test": "PGDATABASE=minidea_test NODE_ENV=test node --test --test-concurrency=1"
 },
+
 
   "repository": {
     "type": "git",

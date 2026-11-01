@@ -1,0 +1,321 @@
+
+openapi: 3.0.3
+
+info:
+  title: MinIdea API
+  version: 1.0.0
+  description: >
+    API REST para administrar autores y publicaciones.
+    Proyecto Integrador del Modulo 2 de Henry.
+    Desarrollado con Node.js, Express y PostgreSQL.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Autores
+    description: Operaciones CRUD de autores
+
+  - name: Publicaciones
+    description: Operaciones CRUD de publicaciones
+
+  - name: Sistema
+    description: Verificacion del servidor
+
+paths:
+  /health:
+    get:
+      tags:
+        - Sistema
+      summary: Comprobar el estado del servidor
+      responses:
+        "200":
+          description: Servidor funcionando correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  project:
+                    type: string
+                    example: MinIdea
+
+  /authors:
+    get:
+      tags:
+        - Autores
+      summary: Obtener todos los autores
+      responses:
+        "200":
+          description: Lista de autores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Autor"
+
+    post:
+      tags:
+        - Autores
+      summary: Crear un autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NuevoAutor"
+      responses:
+        "201":
+          description: Autor creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Autor"
+        "400":
+          description: Datos invalidos
+
+  /authors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador del autor
+        schema:
+          type: integer
+          minimum: 1
+
+    get:
+      tags:
+        - Autores
+      summary: Obtener un autor por ID
+      responses:
+        "200":
+          description: Autor encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Autor"
+        "400":
+          description: Identificador invalido
+        "404":
+          description: Autor no encontrado
+
+    put:
+      tags:
+        - Autores
+      summary: Actualizar un autor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NuevoAutor"
+      responses:
+        "200":
+          description: Autor actualizado correctamente
+        "400":
+          description: Datos invalidos
+        "404":
+          description: Autor no encontrado
+
+    delete:
+      tags:
+        - Autores
+      summary: Eliminar un autor
+      responses:
+        "200":
+          description: Autor eliminado correctamente
+        "400":
+          description: Identificador invalido
+        "404":
+          description: Autor no encontrado
+
+  /posts:
+    get:
+      tags:
+        - Publicaciones
+      summary: Obtener todas las publicaciones
+      responses:
+        "200":
+          description: Lista de publicaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    author_id:
+                      type: integer
+                    author_name:
+                      type: string
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    published:
+                      type: boolean
+
+    post:
+      tags:
+        - Publicaciones
+      summary: Crear una publicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - author_id
+                - title
+                - content
+                - published
+              properties:
+                author_id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: Mi primera publicación
+                content:
+                  type: string
+                  example: Una idea sobre tecnología
+                published:
+                  type: boolean
+                  example: false
+      responses:
+        "201":
+          description: Publicación creada correctamente
+        "400":
+          description: Datos inválidos
+
+  /posts/author/{authorId}:
+    get:
+      tags:
+        - Publicaciones
+      summary: Obtener publicaciones de un autor
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          description: Identificador del autor
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Lista de publicaciones del autor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        "400":
+          description: Identificador inválido
+
+  /posts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Identificador de la publicación
+        schema:
+          type: integer
+          minimum: 1
+
+    get:
+      tags:
+        - Publicaciones
+      summary: Obtener una publicación por ID
+      responses:
+        "200":
+          description: Publicación encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Identificador inválido
+        "404":
+          description: Publicación no encontrada
+
+    put:
+      tags:
+        - Publicaciones
+      summary: Actualizar una publicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - author_id
+                - title
+                - content
+                - published
+              properties:
+                author_id:
+                  type: integer
+                title:
+                  type: string
+                content:
+                  type: string
+                published:
+                  type: boolean
+      responses:
+        "200":
+          description: Publicación actualizada correctamente
+        "400":
+          description: Datos inválidos
+        "404":
+          description: Publicación no encontrada
+
+    delete:
+      tags:
+        - Publicaciones
+      summary: Eliminar una publicación
+      responses:
+        "200":
+          description: Publicación eliminada correctamente
+        "400":
+          description: Identificador inválido
+        "404":
+          description: Publicación no encontrada
+
+components:
+  schemas:
+    NuevoAutor:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          example: Ana López
+        email:
+          type: string
+          format: email
+          example: ana@ejemplo.com
+        bio:
+          type: string
+          example: Escritora especializada en tecnologia
+
+    Autor:
+      allOf:
+        - $ref: "#/components/schemas/NuevoAutor"
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
