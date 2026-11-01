@@ -157,8 +157,7 @@ psql -X -v ON_ERROR_STOP=1 -d minidea_test -f sql/02_seed.sql
 npm test
 ```
 
-El proyecto cuenta con ocho pruebas automatizadas
-que verifican:
+El proyecto cuenta con doce pruebas automatizadas que verifican:
 
 - El funcionamiento de GET /health.
 - La conexión con la base de datos de pruebas.
@@ -168,6 +167,11 @@ que verifican:
 - La validación de autores sin nombre.
 - La consulta de publicaciones por autor.
 - El rechazo de identificadores inválidos.
+- La actualización de autores mediante PUT.
+- La eliminación de autores mediante DELETE.
+- La actualización de publicaciones mediante PUT.
+- La eliminación de publicaciones mediante DELETE.
+
 
 Las pruebas verifican códigos HTTP, respuestas
 JSON y operaciones con PostgreSQL.

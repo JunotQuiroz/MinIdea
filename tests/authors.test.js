@@ -241,3 +241,150 @@ test("POST /authors rechaza un autor sin nombre", async () => {
     }
 });
 
+
+test("PUT /authors/:id actualiza un autor", async () => {
+    let servidor;
+    let autorId;
+
+    try {
+        const db = await pool.query(
+            "SELECT current_database() AS nombre"
+        );
+
+        assert.equal(db.rows[0].nombre, "minidea_test");
+
+        const email = `prueba-put-${Date.now()}@ejemplo.com`;
+
+        const creado = await pool.query(
+            `INSERT INTO authors (name, email, bio)
+             VALUES ($1, $2, $3)
+             RETURNING id`,
+            ["Autor temporal", email, "Biografía original"]
+        );
+
+        autorId = creado.rows[0].id;
+
+        servidor = app.listen(0, "127.0.0.1");
+
+        await new Promise((resolve) => {
+            servidor.once("listening", resolve);
+        });
+
+        const puerto = servidor.address().port;
+
+        const respuesta = await fetch(
+            `http://127.0.0.1:${puerto}/authors/${autorId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: "Autor actualizado",
+                    email: email,
+                    bio: "Biografía actualizada"
+                })
+            }
+        );
+
+        assert.equal(respuesta.status, 200);
+
+        const verificacion = await pool.query(
+            "SELECT name, bio FROM authors WHERE id = $1",
+            [autorId]
+        );
+
+        assert.equal(
+            verificacion.rows[0].name,
+            "Autor actualizado"
+        );
+
+        assert.equal(
+            verificacion.rows[0].bio,
+            "Biografía actualizada"
+        );
+
+    } finally {
+        if (autorId !== undefined) {
+            await pool.query(
+                "DELETE FROM authors WHERE id = $1",
+                [autorId]
+            );
+        }
+
+        if (servidor?.listening) {
+            await new Promise((resolve, reject) => {
+                servidor.close((error) => {
+                    if (error) reject(error);
+                    else resolve();
+                });
+            });
+        }
+    }
+});
+
+
+test("DELETE /authors/:id elimina un autor", async () => {
+    let servidor;
+    let autorId;
+
+    try {
+        const db = await pool.query(
+            "SELECT current_database() AS nombre"
+        );
+
+        assert.equal(db.rows[0].nombre, "minidea_test");
+
+        const email = `prueba-delete-${Date.now()}@ejemplo.com`;
+
+        const creado = await pool.query(
+            `INSERT INTO authors (name, email, bio)
+             VALUES ($1, $2, $3)
+             RETURNING id`,
+            ["Autor para eliminar", email, "Autor temporal"]
+        );
+
+        autorId = creado.rows[0].id;
+
+        servidor = app.listen(0, "127.0.0.1");
+
+        await new Promise((resolve) => {
+            servidor.once("listening", resolve);
+        });
+
+        const puerto = servidor.address().port;
+
+        const respuesta = await fetch(
+            `http://127.0.0.1:${puerto}/authors/${autorId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        assert.equal(respuesta.status, 200);
+
+        const verificacion = await pool.query(
+            "SELECT id FROM authors WHERE id = $1",
+            [autorId]
+        );
+
+        assert.equal(verificacion.rows.length, 0);
+
+    } finally {
+        if (servidor?.listening) {
+            await new Promise((resolve, reject) => {
+                servidor.close((error) => {
+                    if (error) reject(error);
+                    else resolve();
+                });
+            });
+        }
+
+        if (autorId !== undefined) {
+            await pool.query(
+                "DELETE FROM authors WHERE id = $1",
+                [autorId]
+            );
+        }
+    }
+});
