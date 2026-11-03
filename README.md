@@ -415,7 +415,7 @@ Los resultados se revisaron para comprobar respuestas exitosas, validaciones y m
 
 **5. Testing automatizado**
 
-Se creó una base de datos independiente, `minidea_test`, y se implementaron ocho pruebas automatizadas mediante Node.js Test Runner.
+Se creó una base de datos independiente, `minidea_test`, y se implementaron doce pruebas automatizadas mediante Node.js Test Runner.
 
 Estas pruebas permiten comprobar aspectos de la aplicación, la conexión con PostgreSQL y distintos escenarios de los endpoints.
 
