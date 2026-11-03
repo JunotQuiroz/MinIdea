@@ -178,9 +178,32 @@ JSON y operaciones con PostgreSQL.
 
 ## Endpoints de la API
 
-La API utiliza como dirección local:
+La API REST de MinIdea se encuentra desplegada
+en Render y está disponible públicamente.
 
+**Servidor de producción (Render):**
+https://minidea.onrender.com
+
+**Servidor de desarrollo local:**
 http://localhost:3000
+
+### Comprobación de endpoints públicos
+
+- Estado del servidor:
+  https://minidea.onrender.com/health
+
+- Consultar autores:
+  https://minidea.onrender.com/authors
+
+- Consultar publicaciones:
+  https://minidea.onrender.com/posts
+
+El despliegue utiliza Node.js y Express,
+conectados a PostgreSQL alojado en Render.
+
+Nota: el servicio gratuito de Render puede
+tardar en responder después de un periodo
+de inactividad.
 
 ### Autores
 
@@ -254,6 +277,93 @@ el resultado de las solicitudes.
 - 400 Bad Request: datos inválidos.
 - 404 Not Found: recurso no encontrado.
 - 500 Internal Server Error: error interno del servidor.
+
+## Despliegue en Render
+
+MinIdea se encuentra desplegado en Render,
+utilizando un servicio web Node.js y una
+base de datos PostgreSQL.
+
+### 1. Crear la base de datos
+
+1. Crear una instancia PostgreSQL en Render.
+2. Asignar un nombre a la base de datos.
+3. Seleccionar la región de despliegue.
+4. Guardar las credenciales proporcionadas
+   por Render de forma segura.
+
+### 2. Crear el servicio web
+
+1. Seleccionar New Web Service en Render.
+2. Conectar el repositorio de GitHub.
+3. Seleccionar la rama main.
+4. Configurar el entorno Node.js.
+5. Seleccionar la misma región que PostgreSQL.
+
+Configuración utilizada:
+
+- Build Command: npm ci
+- Start Command: npm start
+- Health Check Path: /health
+
+### 3. Configurar variables de entorno
+
+Las siguientes variables deben configurarse
+en el servicio web de Render:
+
+- PGHOST: hostname interno de PostgreSQL.
+- PGPORT: puerto de PostgreSQL.
+- PGDATABASE: nombre de la base de datos.
+- PGUSER: usuario de PostgreSQL.
+- PGPASSWORD: contraseña de PostgreSQL.
+- NODE_ENV: production.
+
+Render proporciona automáticamente el puerto
+del servicio web mediante la variable PORT.
+
+Las credenciales reales no deben incorporarse
+al repositorio de GitHub.
+
+### 4. Preparar las tablas y los datos
+
+Conectarse a PostgreSQL desde una computadora
+local mediante la conexión externa de Render,
+utilizando SSL.
+
+Una vez dentro de psql, ejecutar:
+
+```sql
+\set ON_ERROR_STOP on
+\i sql/01_setup.sql
+\i sql/02_seed.sql
+```
+
+Estos archivos permiten crear las tablas
+authors y posts, así como cargar los datos
+iniciales del proyecto.
+
+Los scripts de preparación deben ejecutarse
+sobre una base de datos nueva para evitar
+duplicaciones o conflictos con datos existentes.
+
+### 5. Comprobar el despliegue
+
+Después del despliegue, verificar:
+
+- GET /health
+- GET /authors
+- GET /posts
+
+Servidor de producción:
+
+https://minidea.onrender.com
+
+El despliegue automático permite publicar
+cambios posteriores al actualizar la rama
+main del repositorio conectado.
+
+Para consultar la documentación de la API,
+importar docs/openapi.yaml en Swagger Editor.
 
 ## Metodología de desarrollo y uso de inteligencia artificial
 

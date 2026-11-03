@@ -10,8 +10,11 @@ info:
     Desarrollado con Node.js, Express y PostgreSQL.
 
 servers:
+  - url: https://minidea.onrender.com
+    description: Servidor de producción en Render
+
   - url: http://localhost:3000
-    description: Servidor local
+    description: Servidor de desarrollo local
 
 tags:
   - name: Autores
